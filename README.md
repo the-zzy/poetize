@@ -43,6 +43,10 @@
 
 替换成自己自定义的内容，因为Https无法跨域，这些内容需要用自己的。
 
+- 博客：https://gitee.com/littledokey/poetize-vue2.git
+- 聊天室：https://gitee.com/littledokey/poetize-im-vue3.git
+- 后端：https://gitee.com/littledokey/poetize.git
+
 ## 欢迎进群
 1. 交流（摸鱼）
 2. 安装部署：互相帮助，争取每个人都零基础拥有自己的个人网站
