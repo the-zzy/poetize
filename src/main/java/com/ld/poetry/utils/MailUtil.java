@@ -42,7 +42,7 @@ public class MailUtil {
      * 6. 网站名称
      */
     public static final String mailText = "<div style=\"font-family: serif;line-height: 22px;padding: 30px\">\n" +
-            "    <div style=\"display: flex;justify-content: center;width: 100%%;max-width: 900px;background-image: url('https://file.poetize.cn/webBackgroundImage/Sara11667042705239112');background-size: cover;border-radius: 10px\"></div>\n" +
+            "    <div style=\"display: flex;justify-content: center;width: 100%%;max-width: 900px;background-image: url('" + CommonConst.DOWNLOAD_URL + "webBackgroundImage/Sara11667042705239112');background-size: cover;border-radius: 10px\"></div>\n" +
             "    <div style=\"margin-top: 20px;display: flex;flex-direction: column;align-items: center\">\n" +
             "        <div style=\"margin: 10px auto 20px;text-align: center\">\n" +
             "            <div style=\"line-height: 32px;font-size: 26px;font-weight: bold;color: #000000\">\n" +
@@ -81,6 +81,7 @@ public class MailUtil {
     public static final String replyMail = "你之前的评论收到来自 %s 的回复";
     public static final String commentMail = "你的文章 %s 收到来自 %s 的评论";
     public static final String messageMail = "你收到来自 %s 的留言";
+    public static final String loveMail = "你收到来自 %s 的祝福";
     public static final String imMail = "你收到来自 %s 的消息";
 
     @Autowired

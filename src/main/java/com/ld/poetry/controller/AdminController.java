@@ -181,7 +181,7 @@ public class AdminController {
         if (comment == null) {
             return PoetryResult.success();
         }
-        if (comment.getSource() == CommonConst.TREE_HOLE_COMMENT_SOURCE) {
+        if (!CommentTypeEnum.COMMENT_TYPE_ARTICLE.getCode().equals(comment.getType())) {
             return PoetryResult.fail("权限不足！");
         }
         Article one = articleService.lambdaQuery().eq(Article::getId, comment.getSource()).select(Article::getUserId).one();

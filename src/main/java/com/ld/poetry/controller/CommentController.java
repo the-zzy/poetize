@@ -42,7 +42,7 @@ public class CommentController {
     @LoginCheck
     public PoetryResult saveComment(@Validated @RequestBody CommentVO commentVO) {
         PoetryUtil.checkEmail();
-        PoetryCache.remove(CommonConst.COMMENT_COUNT_CACHE + commentVO.getSource().toString());
+        PoetryCache.remove(CommonConst.COMMENT_COUNT_CACHE + commentVO.getSource().toString() + "_" + commentVO.getType());
         return commentService.saveComment(commentVO);
     }
 
@@ -62,8 +62,8 @@ public class CommentController {
      * 查询评论数量
      */
     @GetMapping("/getCommentCount")
-    public PoetryResult<Integer> getCommentCount(@RequestParam("source") Integer source) {
-        return PoetryResult.success(commonQuery.getCommentCount(source));
+    public PoetryResult<Integer> getCommentCount(@RequestParam("source") Integer source, @RequestParam("type") String type) {
+        return PoetryResult.success(commonQuery.getCommentCount(source, type));
     }
 
 

@@ -12,6 +12,8 @@ public class BaseRequestVO extends Page {
 
     private Integer source;
 
+    private String commentType;
+
     private Integer floorCommentId;
 
     private String searchKey;
@@ -31,5 +33,5 @@ public class BaseRequestVO extends Page {
 
     private String resourceType;
 
-    private Boolean resourceStatus;
+    private Boolean status;
 }

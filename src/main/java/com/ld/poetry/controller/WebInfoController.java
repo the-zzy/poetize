@@ -1,6 +1,9 @@
 package com.ld.poetry.controller;
 
 
+import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ld.poetry.config.LoginCheck;
@@ -19,10 +22,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 /**
  * <p>
@@ -126,6 +126,9 @@ public class WebInfoController {
         if (!StringUtils.hasText(resourcePath.getTitle()) || !StringUtils.hasText(resourcePath.getType())) {
             return PoetryResult.fail("标题和资源类型不能为空！");
         }
+        if (CommonConst.RESOURCE_PATH_TYPE_LOVE_PHOTO.equals(resourcePath.getType())) {
+            resourcePath.setRemark(PoetryUtil.getAdminUser().getId().toString());
+        }
         resourcePathMapper.insert(resourcePath);
         return PoetryResult.success();
     }
@@ -176,6 +179,9 @@ public class WebInfoController {
         if (resourcePath.getId() == null) {
             return PoetryResult.fail("Id不能为空！");
         }
+        if (CommonConst.RESOURCE_PATH_TYPE_LOVE_PHOTO.equals(resourcePath.getType())) {
+            resourcePath.setRemark(PoetryUtil.getAdminUser().getId().toString());
+        }
         resourcePathMapper.updateById(resourcePath);
         return PoetryResult.success();
     }
@@ -188,22 +194,101 @@ public class WebInfoController {
     public PoetryResult<Page> listResourcePath(@RequestBody BaseRequestVO baseRequestVO) {
         LambdaQueryChainWrapper<ResourcePath> wrapper = new LambdaQueryChainWrapper<>(resourcePathMapper);
         wrapper.eq(StringUtils.hasText(baseRequestVO.getResourceType()), ResourcePath::getType, baseRequestVO.getResourceType());
+        wrapper.eq(StringUtils.hasText(baseRequestVO.getSearchKey()), ResourcePath::getTitle, baseRequestVO.getSearchKey());
 
         Integer userId = PoetryUtil.getUserId();
         if (!PoetryUtil.getAdminUser().getId().equals(userId)) {
             wrapper.eq(ResourcePath::getStatus, Boolean.TRUE);
         } else {
-            wrapper.eq(baseRequestVO.getResourceStatus() != null, ResourcePath::getStatus, baseRequestVO.getResourceStatus());
+            wrapper.eq(baseRequestVO.getStatus() != null, ResourcePath::getStatus, baseRequestVO.getStatus());
         }
-        if (baseRequestVO.isDesc()) {
-            wrapper.orderByDesc(ResourcePath::getCreateTime).page(baseRequestVO);
-        } else {
-            wrapper.orderByAsc(ResourcePath::getCreateTime).page(baseRequestVO);
-        }
+
+        OrderItem orderItem = new OrderItem();
+        orderItem.setColumn(StringUtils.hasText(baseRequestVO.getOrder()) ? StrUtil.toUnderlineCase(baseRequestVO.getOrder()) : "create_time");
+        orderItem.setAsc(!baseRequestVO.isDesc());
+        List<OrderItem> orderItemList = new ArrayList<>();
+        orderItemList.add(orderItem);
+        baseRequestVO.setOrders(orderItemList);
+
+        wrapper.page(baseRequestVO);
 
         return PoetryResult.success(baseRequestVO);
     }
 
+
+    /**
+     * 查询鬼畜
+     */
+    @GetMapping("/listFunny")
+    public PoetryResult<List<Map<String, Object>>> listFunny() {
+        QueryWrapper<ResourcePath> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("title, count(*) as count")
+                .eq("status", Boolean.TRUE)
+                .eq("type", CommonConst.RESOURCE_PATH_TYPE_FUNNY)
+                .groupBy("title");
+        List<Map<String, Object>> maps = resourcePathMapper.selectMaps(queryWrapper);
+        return PoetryResult.success(maps);
+    }
+
+
+    /**
+     * 保存鬼畜
+     */
+    @LoginCheck
+    @PostMapping("/saveFunny")
+    public PoetryResult saveFunny(@RequestBody ResourcePath resourcePath) {
+        PoetryUtil.checkEmail();
+        if (!StringUtils.hasText(resourcePath.getTitle()) || !StringUtils.hasText(resourcePath.getCover()) ||
+                !StringUtils.hasText(resourcePath.getUrl()) || !StringUtils.hasText(resourcePath.getIntroduction())) {
+            return PoetryResult.fail("信息不全！");
+        }
+        ResourcePath funny = new ResourcePath();
+        funny.setTitle(resourcePath.getTitle());
+        funny.setIntroduction(resourcePath.getIntroduction());
+        funny.setCover(resourcePath.getCover());
+        funny.setUrl(resourcePath.getUrl());
+        funny.setType(CommonConst.RESOURCE_PATH_TYPE_FUNNY);
+        funny.setStatus(Boolean.FALSE);
+        resourcePathMapper.insert(funny);
+        return PoetryResult.success();
+    }
+
+    /**
+     * 查询爱情
+     */
+    @GetMapping("/listAdminLovePhoto")
+    public PoetryResult<List<Map<String, Object>>> listAdminLovePhoto() {
+        QueryWrapper<ResourcePath> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("title, count(*) as count")
+                .eq("status", Boolean.TRUE)
+                .eq("remark", PoetryUtil.getAdminUser().getId().toString())
+                .eq("type", CommonConst.RESOURCE_PATH_TYPE_LOVE_PHOTO)
+                .groupBy("title");
+        List<Map<String, Object>> maps = resourcePathMapper.selectMaps(queryWrapper);
+        return PoetryResult.success(maps);
+    }
+
+    /**
+     * 保存爱情
+     */
+    @LoginCheck
+    @PostMapping("/saveLovePhoto")
+    public PoetryResult saveLovePhoto(@RequestBody ResourcePath resourcePath) {
+        PoetryUtil.checkEmail();
+        if (!StringUtils.hasText(resourcePath.getTitle()) || !StringUtils.hasText(resourcePath.getCover()) ||
+                !StringUtils.hasText(resourcePath.getIntroduction())) {
+            return PoetryResult.fail("信息不全！");
+        }
+        ResourcePath lovePhoto = new ResourcePath();
+        lovePhoto.setTitle(resourcePath.getTitle());
+        lovePhoto.setIntroduction(resourcePath.getIntroduction());
+        lovePhoto.setCover(resourcePath.getCover());
+        lovePhoto.setRemark(PoetryUtil.getUserId().toString());
+        lovePhoto.setType(CommonConst.RESOURCE_PATH_TYPE_LOVE_PHOTO);
+        lovePhoto.setStatus(Boolean.FALSE);
+        resourcePathMapper.insert(lovePhoto);
+        return PoetryResult.success();
+    }
 
     /**
      * 保存

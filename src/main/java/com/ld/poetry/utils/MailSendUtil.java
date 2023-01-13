@@ -36,12 +36,13 @@ public class MailSendUtil {
                 mail.add(user.getEmail());
             }
         } else {
-            if (one == null) {
+            if (CommentTypeEnum.COMMENT_TYPE_MESSAGE.getCode().equals(commentVO.getType()) ||
+                    CommentTypeEnum.COMMENT_TYPE_LOVE.getCode().equals(commentVO.getType())) {
                 User adminUser = PoetryUtil.getAdminUser();
                 if (StringUtils.hasText(adminUser.getEmail()) && !Objects.equals(PoetryUtil.getUserId(), adminUser.getId())) {
                     mail.add(adminUser.getEmail());
                 }
-            } else {
+            } else if (CommentTypeEnum.COMMENT_TYPE_ARTICLE.getCode().equals(commentVO.getType())) {
                 User user = commonQuery.getUser(one.getUserId());
                 if (user != null && StringUtils.hasText(user.getEmail()) && !user.getId().equals(PoetryUtil.getUserId())) {
                     mail.add(user.getEmail());
@@ -50,7 +51,11 @@ public class MailSendUtil {
         }
 
         if (!CollectionUtils.isEmpty(mail)) {
-            String commentMail = getCommentMail(one == null ? String.valueOf(CommonConst.TREE_HOLE_COMMENT_SOURCE) : one.getArticleTitle(),
+            String sourceName = "";
+            if (CommentTypeEnum.COMMENT_TYPE_ARTICLE.getCode().equals(commentVO.getType())) {
+                sourceName = one.getArticleTitle();
+            }
+            String commentMail = getCommentMail(commentVO.getType(), sourceName,
                     PoetryUtil.getUsername(),
                     commentVO.getCommentContent(),
                     toName,
@@ -74,11 +79,11 @@ public class MailSendUtil {
      * fromName：评论人
      * toName：被评论人
      */
-    private String getCommentMail(String source, String fromName, String fromContent, String toName, Integer toCommentId, CommentService commentService) {
+    private String getCommentMail(String commentType, String source, String fromName, String fromContent, String toName, Integer toCommentId, CommentService commentService) {
         WebInfo webInfo = (WebInfo) PoetryCache.get(CommonConst.WEB_INFO);
         String webName = (webInfo == null ? "寻国记" : webInfo.getWebName());
 
-        String mailType;
+        String mailType = "";
         String toMail = "";
         if (StringUtils.hasText(toName)) {
             mailType = String.format(MailUtil.replyMail, fromName);
@@ -87,10 +92,12 @@ public class MailSendUtil {
                 toMail = String.format(MailUtil.originalText, toName, toComment.getCommentContent());
             }
         } else {
-            if (String.valueOf(CommonConst.TREE_HOLE_COMMENT_SOURCE).equals(source)) {
+            if (CommentTypeEnum.COMMENT_TYPE_MESSAGE.getCode().equals(commentType)) {
                 mailType = String.format(MailUtil.messageMail, fromName);
-            } else {
+            } else if (CommentTypeEnum.COMMENT_TYPE_ARTICLE.getCode().equals(commentType)) {
                 mailType = String.format(MailUtil.commentMail, source, fromName);
+            } else if (CommentTypeEnum.COMMENT_TYPE_LOVE.getCode().equals(commentType)) {
+                mailType = String.format(MailUtil.loveMail, fromName);
             }
         }
 

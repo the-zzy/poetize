@@ -1,16 +1,16 @@
 package com.ld.poetry.utils;
 
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
-import com.ld.poetry.dao.ArticleMapper;
-import com.ld.poetry.dao.CommentMapper;
-import com.ld.poetry.dao.LabelMapper;
-import com.ld.poetry.dao.SortMapper;
+import com.ld.poetry.dao.*;
 import com.ld.poetry.entity.*;
 import com.ld.poetry.service.UserService;
+import com.ld.poetry.vo.FamilyVO;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,6 +32,9 @@ public class CommonQuery {
     @Autowired
     private ArticleMapper articleMapper;
 
+    @Autowired
+    private FamilyMapper familyMapper;
+
     public User getUser(Integer userId) {
         User user = (User) PoetryCache.get(CommonConst.USER_CACHE + userId.toString());
         if (user != null) {
@@ -45,14 +48,36 @@ public class CommonQuery {
         return null;
     }
 
-    public Integer getCommentCount(Integer source) {
-        Integer count = (Integer) PoetryCache.get(CommonConst.COMMENT_COUNT_CACHE + source.toString());
+    public List<FamilyVO> getFamilyList() {
+        List<FamilyVO> familyVOList = (List<FamilyVO>) PoetryCache.get(CommonConst.FAMILY_LIST);
+        if (familyVOList != null) {
+            return familyVOList;
+        }
+
+        LambdaQueryChainWrapper<Family> queryChainWrapper = new LambdaQueryChainWrapper<>(familyMapper);
+        List<Family> familyList = queryChainWrapper.eq(Family::getStatus, Boolean.TRUE).list();
+        if (!CollectionUtils.isEmpty(familyList)) {
+            familyVOList = familyList.stream().map(family -> {
+                FamilyVO familyVO = new FamilyVO();
+                BeanUtils.copyProperties(family, familyVO);
+                return familyVO;
+            }).collect(Collectors.toList());
+        } else {
+            familyVOList = new ArrayList<>();
+        }
+
+        PoetryCache.put(CommonConst.FAMILY_LIST, familyVOList);
+        return familyVOList;
+    }
+
+    public Integer getCommentCount(Integer source, String type) {
+        Integer count = (Integer) PoetryCache.get(CommonConst.COMMENT_COUNT_CACHE + source.toString() + "_" + type);
         if (count != null) {
             return count;
         }
         LambdaQueryChainWrapper<Comment> wrapper = new LambdaQueryChainWrapper<>(commentMapper);
-        Integer c = wrapper.eq(Comment::getSource, source).count();
-        PoetryCache.put(CommonConst.COMMENT_COUNT_CACHE + source.toString(), c, CommonConst.EXPIRE);
+        Integer c = wrapper.eq(Comment::getSource, source).eq(Comment::getType, type).count();
+        PoetryCache.put(CommonConst.COMMENT_COUNT_CACHE + source.toString() + "_" + type, c, CommonConst.EXPIRE);
         return c;
     }
 

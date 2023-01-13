@@ -41,6 +41,12 @@ public class Comment implements Serializable {
     private Integer parentCommentId;
 
     /**
+     * 评论来源类型
+     */
+    @TableField("type")
+    private String type;
+
+    /**
      * 发表用户ID
      */
     @TableField("user_id")

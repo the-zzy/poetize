@@ -3,11 +3,23 @@ package com.ld.poetry.utils;
 public class CommonConst {
 
     /**
+     * 超级管理员的用户Id
+     */
+    public static final int ADMIN_USER_ID = 1;
+
+    /**
      * 根据用户ID获取Token
      */
     public static final String USER_TOKEN = "user_token_";
 
     public static final String ADMIN_TOKEN = "admin_token_";
+
+    /**
+     * 根据用户ID获取Token
+     */
+    public static final String USER_TOKEN_INTERVAL = "user_token_interval_";
+
+    public static final String ADMIN_TOKEN_INTERVAL = "admin_token_interval_";
 
     /**
      * Token
@@ -19,14 +31,29 @@ public class CommonConst {
     public static final String TOKEN_HEADER = "Authorization";
 
     /**
-     * Token过期时间：6小时
+     * Token过期时间：10天
      */
-    public static final long TOKEN_EXPIRE = 216000;
+    public static final long TOKEN_EXPIRE = 864000;
+
+    /**
+     * Token重设过期时间间隔：1小时
+     */
+    public static final long TOKEN_INTERVAL = 3600;
 
     /**
      * Boss信息
      */
     public static final String ADMIN = "admin";
+
+    /**
+     * BossFamily信息
+     */
+    public static final String ADMIN_FAMILY = "adminFamily";
+
+    /**
+     * FamilyList信息
+     */
+    public static final String FAMILY_LIST = "familyList";
 
     /**
      * 评论和IM邮件
@@ -112,6 +139,8 @@ public class CommonConst {
 
     public static final String BUCKET = "$$$$七牛云BUCKET";
 
+    public static final String DOWNLOAD_URL = "$$$$七牛云访问域名";
+
     /**
      * 资源类型
      */
@@ -141,10 +170,22 @@ public class CommonConst {
 
     public static final String PATH_TYPE_IM_FRIEND_MESSAGE = "im/friendMessage";
 
+    public static final String PATH_TYPE_FUNNY_URL = "funnyUrl";
+
+    public static final String PATH_TYPE_FUNNY_COVER = "funnyCover";
+
+    public static final String PATH_TYPE_LOVE_COVER = "love/bgCover";
+
+    public static final String PATH_TYPE_LOVE_MAN = "love/manCover";
+
+    public static final String PATH_TYPE_LOVE_WOMAN = "love/womanCover";
+
     /**
      * 资源路径
      */
     public static final String RESOURCE_PATH_TYPE_FRIEND = "friendUrl";
+    public static final String RESOURCE_PATH_TYPE_FUNNY = "funny";
+    public static final String RESOURCE_PATH_TYPE_LOVE_PHOTO = "lovePhoto";
 
     /**
      * 微言

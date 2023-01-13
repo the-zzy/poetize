@@ -12,11 +12,14 @@ import com.ld.poetry.utils.PoetryUtil;
 import com.ld.poetry.utils.QiniuUtil;
 import com.ld.poetry.vo.BaseRequestVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -46,6 +49,8 @@ public class ResourceController {
         Resource re = new Resource();
         re.setPath(resource.getPath());
         re.setType(resource.getType());
+        re.setSize(resource.getSize());
+        re.setMimeType(resource.getMimeType());
         re.setUserId(PoetryUtil.getUserId());
         resourceService.save(re);
         return PoetryResult.success();
@@ -57,8 +62,33 @@ public class ResourceController {
     @PostMapping("/deleteResource")
     @LoginCheck(0)
     public PoetryResult deleteResource(@RequestParam("path") String path) {
-        QiniuUtil.deleteFile(Collections.singletonList(path.replace("$$$$七牛云地址", "")));
+        QiniuUtil.deleteFile(Collections.singletonList(path.replace(CommonConst.DOWNLOAD_URL, "")));
         resourceService.lambdaUpdate().eq(Resource::getPath, path).remove();
+        return PoetryResult.success();
+    }
+
+    @GetMapping("/getResourceInfo")
+    @LoginCheck(0)
+    public PoetryResult getResourceInfo() {
+        List<Resource> resources = resourceService.lambdaQuery()
+                .select(Resource::getId, Resource::getPath)
+                .like(Resource::getPath, CommonConst.DOWNLOAD_URL)
+                .isNull(Resource::getSize)
+                .list();
+        if (!CollectionUtils.isEmpty(resources)) {
+            Map<String, Integer> resourceMap = resources.stream().collect(Collectors.toMap(resource -> resource.getPath().replace(CommonConst.DOWNLOAD_URL, ""), Resource::getId));
+            Map<String, Map<String, String>> fileInfo = QiniuUtil.getFileInfo(new ArrayList<>(resourceMap.keySet()));
+            if (!CollectionUtils.isEmpty(fileInfo)) {
+                List<Resource> collect = fileInfo.entrySet().stream().map(entry -> {
+                    Resource resource = new Resource();
+                    resource.setId(resourceMap.get(entry.getKey()));
+                    resource.setSize(Integer.valueOf(entry.getValue().get("size")));
+                    resource.setMimeType(entry.getValue().get("mimeType"));
+                    return resource;
+                }).collect(Collectors.toList());
+                resourceService.updateBatchById(collect);
+            }
+        }
         return PoetryResult.success();
     }
 

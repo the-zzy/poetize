@@ -62,6 +62,7 @@ DROP TABLE IF EXISTS `comment`;
 CREATE TABLE `comment` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT 'id',
   `source` int NOT NULL COMMENT '评论来源标识',
+  `type` varchar(32) NOT NULL COMMENT '评论来源类型',
   `parent_comment_id` int NOT NULL DEFAULT 0 COMMENT '父评论ID',
   `user_id` int NOT NULL COMMENT '发表用户ID',
   `floor_comment_id` int DEFAULT NULL COMMENT '楼层评论ID',
@@ -168,6 +169,60 @@ CREATE TABLE `resource_path` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='资源路径';
 
+DROP TABLE IF EXISTS `resource`;
+
+CREATE TABLE `resource` (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `user_id` int NOT NULL COMMENT '用户ID',
+  `type` varchar(32) NOT NULL COMMENT '资源类型',
+  `path` varchar(256) NOT NULL COMMENT '资源路径',
+  `size` int DEFAULT NULL COMMENT '资源内容的大小，单位：字节',
+  `mime_type` varchar(256) DEFAULT NULL COMMENT '资源的 MIME 类型',
+  `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT '是否启用[0:否，1:是]',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='资源信息';
+
+DROP TABLE IF EXISTS `family`;
+
+CREATE TABLE `family` (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `user_id` int NOT NULL COMMENT '用户ID',
+  `bg_cover` varchar(256) NOT NULL COMMENT '背景封面',
+  `man_cover` varchar(256) NOT NULL COMMENT '男生头像',
+  `woman_cover` varchar(256) NOT NULL COMMENT '女生头像',
+  `man_name` varchar(32) NOT NULL COMMENT '男生昵称',
+  `woman_name` varchar(32) NOT NULL COMMENT '女生昵称',
+  `timing` varchar(32) NOT NULL COMMENT '计时',
+  `countdown_title` varchar(32) DEFAULT NULL COMMENT '倒计时标题',
+  `countdown_time` varchar(32) DEFAULT NULL COMMENT '倒计时时间',
+  `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT '是否启用[0:否，1:是]',
+  `family_info` varchar(1024) DEFAULT NULL COMMENT '额外信息',
+  `like_count` int NOT NULL DEFAULT 0 COMMENT '点赞数',
+
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最终修改时间',
+
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='家庭信息';
+
+
+DROP TABLE IF EXISTS `im_chat_user_friend`;
+
+CREATE TABLE `im_chat_user_friend` (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `user_id` int NOT NULL COMMENT '用户ID',
+  `friend_id` int NOT NULL COMMENT '好友ID',
+  `friend_status` tinyint(2) NOT NULL COMMENT '朋友状态[0:未审核，1:审核通过]',
+  `remark` varchar(32) DEFAULT NULL COMMENT '备注',
+
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `deleted` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否启用[0:未删除，1:已删除]',
+
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='好友';
+
 DROP TABLE IF EXISTS `im_chat_group`;
 
 CREATE TABLE `im_chat_group` (
@@ -232,34 +287,6 @@ CREATE TABLE `im_chat_user_group_message` (
 
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='群聊记录';
-
-DROP TABLE IF EXISTS `im_chat_user_friend`;
-
-CREATE TABLE `im_chat_user_friend` (
-  `id` int NOT NULL AUTO_INCREMENT COMMENT 'id',
-  `user_id` int NOT NULL COMMENT '用户ID',
-  `friend_id` int NOT NULL COMMENT '好友ID',
-  `friend_status` tinyint(2) NOT NULL COMMENT '朋友状态[0:未审核，1:审核通过]',
-  `remark` varchar(32) DEFAULT NULL COMMENT '备注',
-
-  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `deleted` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否启用[0:未删除，1:已删除]',
-
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='好友';
-
-DROP TABLE IF EXISTS `resource`;
-
-CREATE TABLE `resource` (
-  `id` int NOT NULL AUTO_INCREMENT COMMENT 'id',
-  `user_id` int NOT NULL COMMENT '用户ID',
-  `type` varchar(32) NOT NULL COMMENT '资源类型',
-  `path` varchar(256) NOT NULL COMMENT '资源路径',
-  `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT '是否启用[0:否，1:是]',
-  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='资源信息';
 
 
 

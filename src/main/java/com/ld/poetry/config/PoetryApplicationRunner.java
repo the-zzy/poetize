@@ -2,10 +2,12 @@ package com.ld.poetry.config;
 
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.ld.poetry.dao.WebInfoMapper;
+import com.ld.poetry.entity.Family;
 import com.ld.poetry.entity.Sort;
 import com.ld.poetry.entity.User;
 import com.ld.poetry.entity.WebInfo;
 import com.ld.poetry.im.websocket.TioWebsocketStarter;
+import com.ld.poetry.service.FamilyService;
 import com.ld.poetry.service.UserService;
 import com.ld.poetry.utils.CommonConst;
 import com.ld.poetry.utils.CommonQuery;
@@ -32,6 +34,9 @@ public class PoetryApplicationRunner implements ApplicationRunner {
     private UserService userService;
 
     @Autowired
+    private FamilyService familyService;
+
+    @Autowired
     private TioWebsocketStarter tioWebsocketStarter;
 
     @Override
@@ -49,6 +54,9 @@ public class PoetryApplicationRunner implements ApplicationRunner {
 
         User admin = userService.lambdaQuery().eq(User::getUserType, PoetryEnum.USER_TYPE_ADMIN.getCode()).one();
         PoetryCache.put(CommonConst.ADMIN, admin);
+
+        Family family = familyService.lambdaQuery().eq(Family::getUserId, admin.getId()).one();
+        PoetryCache.put(CommonConst.ADMIN_FAMILY, family);
 
         tioWebsocketStarter.start();
     }
