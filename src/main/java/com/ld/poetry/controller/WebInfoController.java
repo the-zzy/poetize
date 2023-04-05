@@ -16,6 +16,7 @@ import com.ld.poetry.entity.*;
 import com.ld.poetry.service.WebInfoService;
 import com.ld.poetry.utils.*;
 import com.ld.poetry.vo.BaseRequestVO;
+import com.ld.poetry.vo.ResourcePathVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
@@ -23,6 +24,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -93,6 +95,14 @@ public class WebInfoController {
     }
 
     /**
+     * 获取赞赏
+     */
+    @GetMapping("/getAdmire")
+    public PoetryResult<List<User>> getAdmire() {
+        return PoetryResult.success(commonQuery.getAdmire());
+    }
+
+    /**
      * 获取分类标签信息
      */
     @GetMapping("/getSortInfo")
@@ -122,13 +132,15 @@ public class WebInfoController {
      */
     @LoginCheck(0)
     @PostMapping("/saveResourcePath")
-    public PoetryResult saveResourcePath(@RequestBody ResourcePath resourcePath) {
-        if (!StringUtils.hasText(resourcePath.getTitle()) || !StringUtils.hasText(resourcePath.getType())) {
+    public PoetryResult saveResourcePath(@RequestBody ResourcePathVO resourcePathVO) {
+        if (!StringUtils.hasText(resourcePathVO.getTitle()) || !StringUtils.hasText(resourcePathVO.getType())) {
             return PoetryResult.fail("标题和资源类型不能为空！");
         }
-        if (CommonConst.RESOURCE_PATH_TYPE_LOVE_PHOTO.equals(resourcePath.getType())) {
-            resourcePath.setRemark(PoetryUtil.getAdminUser().getId().toString());
+        if (CommonConst.RESOURCE_PATH_TYPE_LOVE_PHOTO.equals(resourcePathVO.getType())) {
+            resourcePathVO.setRemark(PoetryUtil.getAdminUser().getId().toString());
         }
+        ResourcePath resourcePath = new ResourcePath();
+        BeanUtils.copyProperties(resourcePathVO, resourcePath);
         resourcePathMapper.insert(resourcePath);
         return PoetryResult.success();
     }
@@ -138,17 +150,16 @@ public class WebInfoController {
      */
     @LoginCheck
     @PostMapping("/saveFriend")
-    public PoetryResult saveFriend(@RequestBody ResourcePath resourcePath) {
-        PoetryUtil.checkEmail();
-        if (!StringUtils.hasText(resourcePath.getTitle()) || !StringUtils.hasText(resourcePath.getCover()) ||
-                !StringUtils.hasText(resourcePath.getUrl()) || !StringUtils.hasText(resourcePath.getIntroduction())) {
+    public PoetryResult saveFriend(@RequestBody ResourcePathVO resourcePathVO) {
+        if (!StringUtils.hasText(resourcePathVO.getTitle()) || !StringUtils.hasText(resourcePathVO.getCover()) ||
+                !StringUtils.hasText(resourcePathVO.getUrl()) || !StringUtils.hasText(resourcePathVO.getIntroduction())) {
             return PoetryResult.fail("信息不全！");
         }
         ResourcePath friend = new ResourcePath();
-        friend.setTitle(resourcePath.getTitle());
-        friend.setIntroduction(resourcePath.getIntroduction());
-        friend.setCover(resourcePath.getCover());
-        friend.setUrl(resourcePath.getUrl());
+        friend.setTitle(resourcePathVO.getTitle());
+        friend.setIntroduction(resourcePathVO.getIntroduction());
+        friend.setCover(resourcePathVO.getCover());
+        friend.setUrl(resourcePathVO.getUrl());
         friend.setType(CommonConst.RESOURCE_PATH_TYPE_FRIEND);
         friend.setStatus(Boolean.FALSE);
         resourcePathMapper.insert(friend);
@@ -172,16 +183,18 @@ public class WebInfoController {
      */
     @PostMapping("/updateResourcePath")
     @LoginCheck(0)
-    public PoetryResult updateResourcePath(@RequestBody ResourcePath resourcePath) {
-        if (!StringUtils.hasText(resourcePath.getTitle()) || !StringUtils.hasText(resourcePath.getType())) {
+    public PoetryResult updateResourcePath(@RequestBody ResourcePathVO resourcePathVO) {
+        if (!StringUtils.hasText(resourcePathVO.getTitle()) || !StringUtils.hasText(resourcePathVO.getType())) {
             return PoetryResult.fail("标题和资源类型不能为空！");
         }
-        if (resourcePath.getId() == null) {
+        if (resourcePathVO.getId() == null) {
             return PoetryResult.fail("Id不能为空！");
         }
-        if (CommonConst.RESOURCE_PATH_TYPE_LOVE_PHOTO.equals(resourcePath.getType())) {
-            resourcePath.setRemark(PoetryUtil.getAdminUser().getId().toString());
+        if (CommonConst.RESOURCE_PATH_TYPE_LOVE_PHOTO.equals(resourcePathVO.getType())) {
+            resourcePathVO.setRemark(PoetryUtil.getAdminUser().getId().toString());
         }
+        ResourcePath resourcePath = new ResourcePath();
+        BeanUtils.copyProperties(resourcePathVO, resourcePath);
         resourcePathMapper.updateById(resourcePath);
         return PoetryResult.success();
     }
@@ -194,7 +207,7 @@ public class WebInfoController {
     public PoetryResult<Page> listResourcePath(@RequestBody BaseRequestVO baseRequestVO) {
         LambdaQueryChainWrapper<ResourcePath> wrapper = new LambdaQueryChainWrapper<>(resourcePathMapper);
         wrapper.eq(StringUtils.hasText(baseRequestVO.getResourceType()), ResourcePath::getType, baseRequestVO.getResourceType());
-        wrapper.eq(StringUtils.hasText(baseRequestVO.getSearchKey()), ResourcePath::getTitle, baseRequestVO.getSearchKey());
+        wrapper.eq(StringUtils.hasText(baseRequestVO.getClassify()), ResourcePath::getClassify, baseRequestVO.getClassify());
 
         Integer userId = PoetryUtil.getUserId();
         if (!PoetryUtil.getAdminUser().getId().equals(userId)) {
@@ -212,41 +225,70 @@ public class WebInfoController {
 
         wrapper.page(baseRequestVO);
 
+        List<ResourcePath> resourcePaths = baseRequestVO.getRecords();
+        if (!CollectionUtils.isEmpty(resourcePaths)) {
+            List<ResourcePathVO> resourcePathVOs = resourcePaths.stream().map(rp -> {
+                ResourcePathVO resourcePathVO = new ResourcePathVO();
+                BeanUtils.copyProperties(rp, resourcePathVO);
+                return resourcePathVO;
+            }).collect(Collectors.toList());
+            baseRequestVO.setRecords(resourcePathVOs);
+        }
         return PoetryResult.success(baseRequestVO);
     }
 
 
     /**
-     * 查询鬼畜
+     * 查询音乐
      */
     @GetMapping("/listFunny")
     public PoetryResult<List<Map<String, Object>>> listFunny() {
         QueryWrapper<ResourcePath> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("title, count(*) as count")
+        queryWrapper.select("classify, count(*) as count")
                 .eq("status", Boolean.TRUE)
                 .eq("type", CommonConst.RESOURCE_PATH_TYPE_FUNNY)
-                .groupBy("title");
+                .groupBy("classify");
         List<Map<String, Object>> maps = resourcePathMapper.selectMaps(queryWrapper);
         return PoetryResult.success(maps);
     }
 
+    /**
+     * 查询收藏
+     */
+    @GetMapping("/listCollect")
+    public PoetryResult<Map<String, List<ResourcePathVO>>> listCollect() {
+        LambdaQueryChainWrapper<ResourcePath> wrapper = new LambdaQueryChainWrapper<>(resourcePathMapper);
+        List<ResourcePath> resourcePaths = wrapper.eq(ResourcePath::getType, CommonConst.RESOURCE_PATH_TYPE_FAVORITES)
+                .eq(ResourcePath::getStatus, Boolean.TRUE)
+                .orderByAsc(ResourcePath::getTitle)
+                .list();
+        Map<String, List<ResourcePathVO>> collect = new HashMap<>();
+        if (!CollectionUtils.isEmpty(resourcePaths)) {
+            collect = resourcePaths.stream().map(rp -> {
+                ResourcePathVO resourcePathVO = new ResourcePathVO();
+                BeanUtils.copyProperties(rp, resourcePathVO);
+                return resourcePathVO;
+            }).collect(Collectors.groupingBy(ResourcePathVO::getClassify));
+        }
+        return PoetryResult.success(collect);
+    }
+
 
     /**
-     * 保存鬼畜
+     * 保存音乐
      */
     @LoginCheck
     @PostMapping("/saveFunny")
-    public PoetryResult saveFunny(@RequestBody ResourcePath resourcePath) {
-        PoetryUtil.checkEmail();
-        if (!StringUtils.hasText(resourcePath.getTitle()) || !StringUtils.hasText(resourcePath.getCover()) ||
-                !StringUtils.hasText(resourcePath.getUrl()) || !StringUtils.hasText(resourcePath.getIntroduction())) {
+    public PoetryResult saveFunny(@RequestBody ResourcePathVO resourcePathVO) {
+        if (!StringUtils.hasText(resourcePathVO.getClassify()) || !StringUtils.hasText(resourcePathVO.getCover()) ||
+                !StringUtils.hasText(resourcePathVO.getUrl()) || !StringUtils.hasText(resourcePathVO.getTitle())) {
             return PoetryResult.fail("信息不全！");
         }
         ResourcePath funny = new ResourcePath();
-        funny.setTitle(resourcePath.getTitle());
-        funny.setIntroduction(resourcePath.getIntroduction());
-        funny.setCover(resourcePath.getCover());
-        funny.setUrl(resourcePath.getUrl());
+        funny.setClassify(resourcePathVO.getClassify());
+        funny.setTitle(resourcePathVO.getTitle());
+        funny.setCover(resourcePathVO.getCover());
+        funny.setUrl(resourcePathVO.getUrl());
         funny.setType(CommonConst.RESOURCE_PATH_TYPE_FUNNY);
         funny.setStatus(Boolean.FALSE);
         resourcePathMapper.insert(funny);
@@ -259,11 +301,11 @@ public class WebInfoController {
     @GetMapping("/listAdminLovePhoto")
     public PoetryResult<List<Map<String, Object>>> listAdminLovePhoto() {
         QueryWrapper<ResourcePath> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("title, count(*) as count")
+        queryWrapper.select("classify, count(*) as count")
                 .eq("status", Boolean.TRUE)
                 .eq("remark", PoetryUtil.getAdminUser().getId().toString())
                 .eq("type", CommonConst.RESOURCE_PATH_TYPE_LOVE_PHOTO)
-                .groupBy("title");
+                .groupBy("classify");
         List<Map<String, Object>> maps = resourcePathMapper.selectMaps(queryWrapper);
         return PoetryResult.success(maps);
     }
@@ -273,16 +315,15 @@ public class WebInfoController {
      */
     @LoginCheck
     @PostMapping("/saveLovePhoto")
-    public PoetryResult saveLovePhoto(@RequestBody ResourcePath resourcePath) {
-        PoetryUtil.checkEmail();
-        if (!StringUtils.hasText(resourcePath.getTitle()) || !StringUtils.hasText(resourcePath.getCover()) ||
-                !StringUtils.hasText(resourcePath.getIntroduction())) {
+    public PoetryResult saveLovePhoto(@RequestBody ResourcePathVO resourcePathVO) {
+        if (!StringUtils.hasText(resourcePathVO.getClassify()) || !StringUtils.hasText(resourcePathVO.getCover()) ||
+                !StringUtils.hasText(resourcePathVO.getTitle())) {
             return PoetryResult.fail("信息不全！");
         }
         ResourcePath lovePhoto = new ResourcePath();
-        lovePhoto.setTitle(resourcePath.getTitle());
-        lovePhoto.setIntroduction(resourcePath.getIntroduction());
-        lovePhoto.setCover(resourcePath.getCover());
+        lovePhoto.setClassify(resourcePathVO.getClassify());
+        lovePhoto.setTitle(resourcePathVO.getTitle());
+        lovePhoto.setCover(resourcePathVO.getCover());
         lovePhoto.setRemark(PoetryUtil.getUserId().toString());
         lovePhoto.setType(CommonConst.RESOURCE_PATH_TYPE_LOVE_PHOTO);
         lovePhoto.setStatus(Boolean.FALSE);
@@ -335,7 +376,6 @@ public class WebInfoController {
             if (!StringUtils.hasText(treeHole.getAvatar())) {
                 treeHole.setAvatar(PoetryUtil.getRandomAvatar(treeHole.getId().toString()));
             }
-            treeHole.setDeleted(null);
         });
         return PoetryResult.success(treeHoles);
     }

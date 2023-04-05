@@ -40,7 +40,6 @@ public class WeiYanController {
     @PostMapping("/saveWeiYan")
     @LoginCheck
     public PoetryResult saveWeiYan(@RequestBody WeiYan weiYanVO) {
-        PoetryUtil.checkEmail();
         if (!StringUtils.hasText(weiYanVO.getContent())) {
             return PoetryResult.fail("微言不能为空！");
         }
@@ -107,7 +106,6 @@ public class WeiYanController {
     @GetMapping("/deleteWeiYan")
     @LoginCheck
     public PoetryResult deleteWeiYan(@RequestParam("id") Integer id) {
-        PoetryUtil.checkEmail();
         Integer userId = PoetryUtil.getUserId();
         weiYanService.lambdaUpdate().eq(WeiYan::getId, id)
                 .eq(WeiYan::getUserId, userId)

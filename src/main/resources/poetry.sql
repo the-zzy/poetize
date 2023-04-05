@@ -20,6 +20,7 @@ CREATE TABLE `user` (
   `gender` tinyint(2) DEFAULT NULL COMMENT '性别[1:男，2:女，0:保密]',
   `open_id` varchar(128) DEFAULT NULL COMMENT 'openId',
   `avatar` varchar(256) DEFAULT NULL COMMENT '头像',
+  `admire` varchar(32) DEFAULT NULL COMMENT '赞赏',
   `introduction` varchar(4096) DEFAULT NULL COMMENT '简介',
   `user_type` tinyint(2) NOT NULL DEFAULT 2 COMMENT '用户类型[0:admin，1:管理员，2:普通用户]',
 
@@ -72,7 +73,6 @@ CREATE TABLE `comment` (
   `comment_info` varchar(256) DEFAULT NULL COMMENT '评论额外信息',
 
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `deleted` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否启用[0:未删除，1:已删除]',
 
   PRIMARY KEY (`id`),
   KEY `source` (`source`)
@@ -109,7 +109,6 @@ CREATE TABLE `tree_hole` (
   `message` varchar(64) NOT NULL COMMENT '留言',
 
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `deleted` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否启用[0:未删除，1:已删除]',
 
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='树洞';
@@ -126,7 +125,6 @@ CREATE TABLE `wei_yan` (
   `is_public` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否公开[0:仅自己可见，1:所有人可见]',
 
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `deleted` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否启用[0:未删除，1:已删除]',
 
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`)
@@ -156,6 +154,7 @@ DROP TABLE IF EXISTS `resource_path`;
 CREATE TABLE `resource_path` (
   `id` int NOT NULL AUTO_INCREMENT COMMENT 'id',
   `title` varchar(64) NOT NULL COMMENT '标题',
+  `classify` varchar(32) DEFAULT NULL COMMENT '分类',
   `cover` varchar(256) DEFAULT NULL COMMENT '封面',
   `url` varchar(256) DEFAULT NULL COMMENT '链接',
   `introduction` varchar(1024) DEFAULT NULL COMMENT '简介',
@@ -164,7 +163,6 @@ CREATE TABLE `resource_path` (
   `remark` text DEFAULT NULL COMMENT '备注',
 
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `deleted` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否启用[0:未删除，1:已删除]',
 
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='资源路径';
@@ -218,7 +216,6 @@ CREATE TABLE `im_chat_user_friend` (
   `remark` varchar(32) DEFAULT NULL COMMENT '备注',
 
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `deleted` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否启用[0:未删除，1:已删除]',
 
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='好友';
@@ -235,7 +232,6 @@ CREATE TABLE `im_chat_group` (
   `in_type` tinyint(1) NOT NULL DEFAULT 1 COMMENT '进入方式[0:无需验证，1:需要群主或管理员同意]',
   `group_type` tinyint(2) NOT NULL DEFAULT 1 COMMENT '类型[1:聊天群，2:话题]',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `deleted` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否启用[0:未删除，1:已删除]',
 
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='聊天群';
@@ -252,7 +248,6 @@ CREATE TABLE `im_chat_group_user` (
   `user_status` tinyint(2) NOT NULL COMMENT '用户状态[0:未审核，1:审核通过，2:禁言]',
 
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `deleted` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否启用[0:未删除，1:已删除]',
 
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='聊天群成员';
@@ -267,7 +262,6 @@ CREATE TABLE `im_chat_user_message` (
   `message_status` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否已读[0:未读，1:已读]',
 
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `deleted` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否启用[0:未删除，1:已删除]',
 
   PRIMARY KEY (`id`),
   KEY `union_index` (`to_id`,`message_status`)
@@ -283,7 +277,6 @@ CREATE TABLE `im_chat_user_group_message` (
   `content` varchar(1024) NOT NULL COMMENT '内容',
 
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `deleted` tinyint(1) NOT NULL DEFAULT 0 COMMENT '是否启用[0:未删除，1:已删除]',
 
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='群聊记录';
@@ -294,7 +287,7 @@ CREATE TABLE `im_chat_user_group_message` (
 
 -- 第三步：执行初始化语句
 
-INSERT INTO `user` (`id`, `username`, `password`, `phone_number`, `email`, `user_status`, `gender`, `open_id`, `avatar`, `introduction`, `user_type`, `update_by`, `deleted`) VALUES(1, 'Sara', '47bce5c74f589f4867dbd57e9ca9f808', '', '', 1, 1, '', '', '', 0, 'Sara', 0);
+INSERT INTO `user` (`id`, `username`, `password`, `phone_number`, `email`, `user_status`, `gender`, `open_id`, `avatar`, `introduction`, `user_type`, `update_by`, `deleted`, `admire`) VALUES(1, 'Sara', '47bce5c74f589f4867dbd57e9ca9f808', '', '', 1, 1, '', '', '', 0, 'Sara', 0, '');
 
 INSERT INTO `web_info` (`id`, `web_name`, `web_title`, `notices`, `footer`, `background_image`, `avatar`, `random_avatar`, `random_name`, `random_cover`, `waifu_json`, `status`) VALUES(1, 'Sara', '寻国记', '[]', '云想衣裳花想容， 春风拂槛露华浓。', '', '', '[]', '[]', '[]', '{}', 1);
 

@@ -73,6 +73,20 @@ public class AdminController {
     }
 
     /**
+     * 修改用户赞赏
+     */
+    @GetMapping("/user/changeUserAdmire")
+    @LoginCheck(0)
+    public PoetryResult changeUserAdmire(@RequestParam("userId") Integer userId, @RequestParam("admire") String admire) {
+        userService.lambdaUpdate()
+                .eq(User::getId, userId)
+                .set(User::getAdmire, admire)
+                .update();
+        PoetryCache.remove(CommonConst.ADMIRE);
+        return PoetryResult.success();
+    }
+
+    /**
      * 修改用户类型
      */
     @GetMapping("/user/changeUserType")

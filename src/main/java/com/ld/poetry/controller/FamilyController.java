@@ -135,6 +135,7 @@ public class FamilyController {
     @LoginCheck(0)
     public PoetryResult changeLoveStatus(@RequestParam("id") Integer id, @RequestParam("flag") Boolean flag) {
         familyService.lambdaUpdate().eq(Family::getId, id).set(Family::getStatus, flag).update();
+        PoetryCache.remove(CommonConst.FAMILY_LIST);
         return PoetryResult.success();
     }
 }

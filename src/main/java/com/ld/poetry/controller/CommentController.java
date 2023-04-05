@@ -7,7 +7,6 @@ import com.ld.poetry.service.CommentService;
 import com.ld.poetry.utils.CommonConst;
 import com.ld.poetry.utils.CommonQuery;
 import com.ld.poetry.utils.PoetryCache;
-import com.ld.poetry.utils.PoetryUtil;
 import com.ld.poetry.vo.BaseRequestVO;
 import com.ld.poetry.vo.CommentVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +40,6 @@ public class CommentController {
     @PostMapping("/saveComment")
     @LoginCheck
     public PoetryResult saveComment(@Validated @RequestBody CommentVO commentVO) {
-        PoetryUtil.checkEmail();
         PoetryCache.remove(CommonConst.COMMENT_COUNT_CACHE + commentVO.getSource().toString() + "_" + commentVO.getType());
         return commentService.saveComment(commentVO);
     }
@@ -53,7 +51,6 @@ public class CommentController {
     @GetMapping("/deleteComment")
     @LoginCheck
     public PoetryResult deleteComment(@RequestParam("id") Integer id) {
-        PoetryUtil.checkEmail();
         return commentService.deleteComment(id);
     }
 

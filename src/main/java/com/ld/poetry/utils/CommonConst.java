@@ -86,6 +86,11 @@ public class CommonConst {
     public static final String SORT_INFO = "sortInfo";
 
     /**
+     * 赞赏
+     */
+    public static final String ADMIRE = "admire";
+
+    /**
      * 密钥
      */
     public static final String CRYPOTJS_KEY = "aoligeimeimaobin";
@@ -174,6 +179,8 @@ public class CommonConst {
 
     public static final String PATH_TYPE_FUNNY_COVER = "funnyCover";
 
+    public static final String PATH_TYPE_FAVORITES_COVER = "favoritesCover";
+
     public static final String PATH_TYPE_LOVE_COVER = "love/bgCover";
 
     public static final String PATH_TYPE_LOVE_MAN = "love/manCover";
@@ -185,6 +192,7 @@ public class CommonConst {
      */
     public static final String RESOURCE_PATH_TYPE_FRIEND = "friendUrl";
     public static final String RESOURCE_PATH_TYPE_FUNNY = "funny";
+    public static final String RESOURCE_PATH_TYPE_FAVORITES = "favorites";
     public static final String RESOURCE_PATH_TYPE_LOVE_PHOTO = "lovePhoto";
 
     /**

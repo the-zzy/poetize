@@ -48,6 +48,18 @@ public class CommonQuery {
         return null;
     }
 
+    public List<User> getAdmire() {
+        List<User> admire = (List<User>) PoetryCache.get(CommonConst.ADMIRE);
+        if (admire != null) {
+            return admire;
+        }
+        List<User> users = userService.lambdaQuery().select(User::getUsername, User::getAdmire, User::getAvatar).isNotNull(User::getAdmire).list();
+
+        PoetryCache.put(CommonConst.ADMIRE, users, CommonConst.EXPIRE);
+
+        return users;
+    }
+
     public List<FamilyVO> getFamilyList() {
         List<FamilyVO> familyVOList = (List<FamilyVO>) PoetryCache.get(CommonConst.FAMILY_LIST);
         if (familyVOList != null) {

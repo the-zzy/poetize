@@ -34,4 +34,6 @@ public class BaseRequestVO extends Page {
     private String resourceType;
 
     private Boolean status;
+
+    private String classify;
 }

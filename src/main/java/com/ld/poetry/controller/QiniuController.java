@@ -18,7 +18,6 @@ public class QiniuController {
     @GetMapping("/getUpToken")
     @LoginCheck
     public PoetryResult<String> getUpToken(@RequestParam(value = "key", required = false) String key) {
-        PoetryUtil.checkEmail();
         return PoetryResult.success(QiniuUtil.getToken(key));
     }
 }
