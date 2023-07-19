@@ -191,7 +191,7 @@ public class AdminController {
     @GetMapping("/comment/user/deleteComment")
     @LoginCheck(1)
     public PoetryResult userDeleteComment(@RequestParam("id") Integer id) {
-        Comment comment = commentService.lambdaQuery().select(Comment::getSource).eq(Comment::getId, id).one();
+        Comment comment = commentService.lambdaQuery().select(Comment::getSource, Comment::getType).eq(Comment::getId, id).one();
         if (comment == null) {
             return PoetryResult.success();
         }

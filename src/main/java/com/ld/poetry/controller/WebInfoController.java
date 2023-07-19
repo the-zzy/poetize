@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapp
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ld.poetry.config.LoginCheck;
 import com.ld.poetry.config.PoetryResult;
+import com.ld.poetry.config.SaveCheck;
 import com.ld.poetry.dao.LabelMapper;
 import com.ld.poetry.dao.ResourcePathMapper;
 import com.ld.poetry.dao.SortMapper;
@@ -150,6 +151,7 @@ public class WebInfoController {
      */
     @LoginCheck
     @PostMapping("/saveFriend")
+    @SaveCheck
     public PoetryResult saveFriend(@RequestBody ResourcePathVO resourcePathVO) {
         if (!StringUtils.hasText(resourcePathVO.getTitle()) || !StringUtils.hasText(resourcePathVO.getCover()) ||
                 !StringUtils.hasText(resourcePathVO.getUrl()) || !StringUtils.hasText(resourcePathVO.getIntroduction())) {
@@ -278,6 +280,7 @@ public class WebInfoController {
      * 保存音乐
      */
     @LoginCheck
+    @SaveCheck
     @PostMapping("/saveFunny")
     public PoetryResult saveFunny(@RequestBody ResourcePathVO resourcePathVO) {
         if (!StringUtils.hasText(resourcePathVO.getClassify()) || !StringUtils.hasText(resourcePathVO.getCover()) ||
@@ -314,6 +317,7 @@ public class WebInfoController {
      * 保存爱情
      */
     @LoginCheck
+    @SaveCheck
     @PostMapping("/saveLovePhoto")
     public PoetryResult saveLovePhoto(@RequestBody ResourcePathVO resourcePathVO) {
         if (!StringUtils.hasText(resourcePathVO.getClassify()) || !StringUtils.hasText(resourcePathVO.getCover()) ||
@@ -335,6 +339,7 @@ public class WebInfoController {
      * 保存
      */
     @PostMapping("/saveTreeHole")
+    @SaveCheck
     public PoetryResult<TreeHole> saveTreeHole(@RequestBody TreeHole treeHole) {
         if (!StringUtils.hasText(treeHole.getMessage())) {
             return PoetryResult.fail("留言不能为空！");

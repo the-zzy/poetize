@@ -3,13 +3,16 @@ package com.ld.poetry.controller;
 
 import com.ld.poetry.config.LoginCheck;
 import com.ld.poetry.config.PoetryResult;
+import com.ld.poetry.config.SaveCheck;
 import com.ld.poetry.service.CommentService;
 import com.ld.poetry.utils.CommonConst;
 import com.ld.poetry.utils.CommonQuery;
 import com.ld.poetry.utils.PoetryCache;
+import com.ld.poetry.utils.StringUtil;
 import com.ld.poetry.vo.BaseRequestVO;
 import com.ld.poetry.vo.CommentVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,7 +42,14 @@ public class CommentController {
      */
     @PostMapping("/saveComment")
     @LoginCheck
+    @SaveCheck
     public PoetryResult saveComment(@Validated @RequestBody CommentVO commentVO) {
+        String content = StringUtil.removeHtml(commentVO.getCommentContent());
+        if (!StringUtils.hasText(content)) {
+            return PoetryResult.fail("评论内容不合法！");
+        }
+        commentVO.setCommentContent(content);
+
         PoetryCache.remove(CommonConst.COMMENT_COUNT_CACHE + commentVO.getSource().toString() + "_" + commentVO.getType());
         return commentService.saveComment(commentVO);
     }

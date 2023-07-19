@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapp
 import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.ld.poetry.config.LoginCheck;
 import com.ld.poetry.config.PoetryResult;
+import com.ld.poetry.config.SaveCheck;
 import com.ld.poetry.entity.User;
 import com.ld.poetry.im.http.entity.ImChatGroup;
 import com.ld.poetry.im.http.entity.ImChatGroupUser;
@@ -60,6 +61,7 @@ public class ImChatGroupController {
      */
     @PostMapping("/creatGroupCommon")
     @LoginCheck
+    @SaveCheck
     public PoetryResult creatGroup(@RequestBody ImChatGroup imChatGroup) {
         if (!StringUtils.hasText(imChatGroup.getGroupName())) {
             return PoetryResult.fail(CodeMsg.PARAMETER_ERROR);

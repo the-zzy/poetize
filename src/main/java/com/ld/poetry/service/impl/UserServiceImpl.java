@@ -203,9 +203,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         u.setPhoneNumber(user.getPhoneNumber());
         u.setEmail(user.getEmail());
         u.setPassword(DigestUtils.md5DigestAsHex(user.getPassword().getBytes()));
-        if (!StringUtils.hasText(u.getAvatar())) {
-            u.setAvatar(PoetryUtil.getRandomAvatar(null));
-        }
+        u.setAvatar(PoetryUtil.getRandomAvatar(null));
         save(u);
 
         User one = lambdaQuery().eq(User::getId, u.getId()).one();
@@ -303,7 +301,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             mail.add(user.getEmail());
             String text = getCodeMail(i);
             WebInfo webInfo = (WebInfo) PoetryCache.get(CommonConst.WEB_INFO);
-            mailUtil.sendMailMessage(mail, "您有一封来自" + (webInfo == null ? "寻国记" : webInfo.getWebName()) + "的回执！", text);
+            mailUtil.sendMailMessage(mail, "您有一封来自" + (webInfo == null ? "Poetize" : webInfo.getWebName()) + "的回执！", text);
         }
         PoetryCache.put(CommonConst.USER_CODE + PoetryUtil.getUserId() + "_" + flag, Integer.valueOf(i), 300);
         return PoetryResult.success();
@@ -320,7 +318,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             mail.add(place);
             String text = getCodeMail(i);
             WebInfo webInfo = (WebInfo) PoetryCache.get(CommonConst.WEB_INFO);
-            mailUtil.sendMailMessage(mail, "您有一封来自" + (webInfo == null ? "寻国记" : webInfo.getWebName()) + "的回执！", text);
+            mailUtil.sendMailMessage(mail, "您有一封来自" + (webInfo == null ? "Poetize" : webInfo.getWebName()) + "的回执！", text);
         }
         PoetryCache.put(CommonConst.USER_CODE + PoetryUtil.getUserId() + "_" + place + "_" + flag, Integer.valueOf(i), 300);
         return PoetryResult.success();
@@ -399,7 +397,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             mail.add(place);
             String text = getCodeMail(i);
             WebInfo webInfo = (WebInfo) PoetryCache.get(CommonConst.WEB_INFO);
-            mailUtil.sendMailMessage(mail, "您有一封来自" + (webInfo == null ? "寻国记" : webInfo.getWebName()) + "的回执！", text);
+            mailUtil.sendMailMessage(mail, "您有一封来自" + (webInfo == null ? "Poetize" : webInfo.getWebName()) + "的回执！", text);
         }
         PoetryCache.put(CommonConst.FORGET_PASSWORD + place + "_" + flag, Integer.valueOf(i), 300);
         return PoetryResult.success();
@@ -515,7 +513,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     private String getCodeMail(int i) {
         WebInfo webInfo = (WebInfo) PoetryCache.get(CommonConst.WEB_INFO);
-        String webName = (webInfo == null ? "寻国记" : webInfo.getWebName());
+        String webName = (webInfo == null ? "生活倒影" : webInfo.getWebName());
         return String.format(MailUtil.mailText,
                 webName,
                 String.format(MailUtil.imMail, PoetryUtil.getAdminUser().getUsername()),

@@ -64,7 +64,7 @@ public class MailSendUtil {
             AtomicInteger count = (AtomicInteger) PoetryCache.get(CommonConst.COMMENT_IM_MAIL + mail.get(0));
             if (count == null || count.get() < CommonConst.COMMENT_IM_MAIL_COUNT) {
                 WebInfo webInfo = (WebInfo) PoetryCache.get(CommonConst.WEB_INFO);
-                mailUtil.sendMailMessage(mail, "您有一封来自" + (webInfo == null ? "寻国记" : webInfo.getWebName()) + "的回执！", commentMail);
+                mailUtil.sendMailMessage(mail, "您有一封来自" + (webInfo == null ? "Poetize" : webInfo.getWebName()) + "的回执！", commentMail);
                 if (count == null) {
                     PoetryCache.put(CommonConst.COMMENT_IM_MAIL + mail.get(0), new AtomicInteger(1), CommonConst.TOKEN_EXPIRE * 4);
                 } else {
@@ -81,7 +81,7 @@ public class MailSendUtil {
      */
     private String getCommentMail(String commentType, String source, String fromName, String fromContent, String toName, Integer toCommentId, CommentService commentService) {
         WebInfo webInfo = (WebInfo) PoetryCache.get(CommonConst.WEB_INFO);
-        String webName = (webInfo == null ? "寻国记" : webInfo.getWebName());
+        String webName = (webInfo == null ? "Poetize" : webInfo.getWebName());
 
         String mailType = "";
         String toMail = "";
@@ -129,7 +129,7 @@ public class MailSendUtil {
                 AtomicInteger count = (AtomicInteger) PoetryCache.get(CommonConst.COMMENT_IM_MAIL + mail.get(0));
                 if (count == null || count.get() < CommonConst.COMMENT_IM_MAIL_COUNT) {
                     WebInfo webInfo = (WebInfo) PoetryCache.get(CommonConst.WEB_INFO);
-                    mailUtil.sendMailMessage(mail, "您有一封来自" + (webInfo == null ? "寻国记" : webInfo.getWebName()) + "的回执！", commentMail);
+                    mailUtil.sendMailMessage(mail, "您有一封来自" + (webInfo == null ? "Poetize" : webInfo.getWebName()) + "的回执！", commentMail);
                     if (count == null) {
                         PoetryCache.put(CommonConst.COMMENT_IM_MAIL + mail.get(0), new AtomicInteger(1), CommonConst.TOKEN_EXPIRE * 4);
                     } else {
@@ -142,7 +142,7 @@ public class MailSendUtil {
 
     private String getImMail(String fromName, String fromContent) {
         WebInfo webInfo = (WebInfo) PoetryCache.get(CommonConst.WEB_INFO);
-        String webName = (webInfo == null ? "寻国记" : webInfo.getWebName());
+        String webName = (webInfo == null ? "Poetize" : webInfo.getWebName());
 
         return String.format(MailUtil.mailText,
                 webName,

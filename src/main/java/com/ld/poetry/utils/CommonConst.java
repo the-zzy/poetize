@@ -31,6 +31,14 @@ public class CommonConst {
     public static final String TOKEN_HEADER = "Authorization";
 
     /**
+     * 保存次数
+     */
+    public static final String SAVE_COUNT_IP = "save_count_ip_";
+    public static final String SAVE_COUNT_USER_ID = "save_count_user_id_";
+    public static final long SAVE_EXPIRE = 86400;
+    public static final int SAVE_MAX_COUNT = 15;
+
+    /**
      * Token过期时间：10天
      */
     public static final long TOKEN_EXPIRE = 864000;
