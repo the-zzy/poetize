@@ -513,7 +513,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     private String getCodeMail(int i) {
         WebInfo webInfo = (WebInfo) PoetryCache.get(CommonConst.WEB_INFO);
-        String webName = (webInfo == null ? "生活倒影" : webInfo.getWebName());
+        String webName = (webInfo == null ? "Poetize" : webInfo.getWebName());
         return String.format(MailUtil.mailText,
                 webName,
                 String.format(MailUtil.imMail, PoetryUtil.getAdminUser().getUsername()),
