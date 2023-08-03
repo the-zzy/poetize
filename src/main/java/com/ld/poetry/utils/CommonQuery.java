@@ -5,10 +5,11 @@ import com.ld.poetry.dao.*;
 import com.ld.poetry.entity.*;
 import com.ld.poetry.service.UserService;
 import com.ld.poetry.vo.FamilyVO;
+import org.apache.commons.io.IOUtils;
 import org.lionsoul.ip2region.xdb.Searcher;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -42,15 +43,12 @@ public class CommonQuery {
     @Autowired
     private FamilyMapper familyMapper;
 
-    @Value("${ip2region.dbpath}")
-    private String dbpath;
-
     private Searcher searcher;
 
     @PostConstruct
     public void init() {
         try {
-            searcher = Searcher.newWithBuffer(Searcher.loadContentFromFile(dbpath));
+            searcher = Searcher.newWithBuffer(IOUtils.toByteArray(new ClassPathResource("ip2region.xdb").getInputStream()));
         } catch (Exception e) {
         }
     }
