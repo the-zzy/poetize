@@ -39,6 +39,16 @@ public class CommonConst {
     public static final int SAVE_MAX_COUNT = 15;
 
     /**
+     * IP历史记录缓存
+     */
+    public static final String IP_HISTORY = "ip_history";
+    public static final String IP_HISTORY_STATISTICS = "ip_history_statistics";
+    public static final String IP_HISTORY_PROVINCE = "ip_history_province";
+    public static final String IP_HISTORY_IP = "ip_history_ip";
+    public static final String IP_HISTORY_HOUR = "ip_history_hour";
+    public static final String IP_HISTORY_COUNT = "ip_history_count";
+
+    /**
      * Token过期时间：10天
      */
     public static final long TOKEN_EXPIRE = 864000;
@@ -119,6 +129,11 @@ public class CommonConst {
     public static final String USER_ARTICLE_LIST = "user_article_list_";
 
     /**
+     * 文章缓存，用于搜索
+     */
+    public static final String ARTICLE_LIST = "article_list";
+
+    /**
      * 默认缓存过期时间
      */
     public static final long EXPIRE = 1800;
@@ -142,17 +157,6 @@ public class CommonConst {
      * 留言的源
      */
     public static final int TREE_HOLE_COMMENT_SOURCE = 0;
-
-    /**
-     * 七牛云
-     */
-    public static final String ACCESS_KEY = "$$$$七牛云密钥";
-
-    public static final String SECRET_KEY = "$$$$七牛云密钥";
-
-    public static final String BUCKET = "$$$$七牛云BUCKET";
-
-    public static final String DOWNLOAD_URL = "$$$$七牛云访问域名";
 
     /**
      * 资源类型

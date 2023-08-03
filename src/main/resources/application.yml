@@ -37,3 +37,12 @@ spring:
 user:
   code:
     format: 【poetize.cn】%s为本次验证的验证码，请在5分钟内完成验证。为保证账号安全，请勿泄漏此验证码。
+
+ip2region:
+  dbpath: $$$$ip2region.xdb访问地址，放在服务器可访问的地方，类似/home/ip2region.xdb
+
+qiniu:
+  accessKey: $$$$七牛云accessKey
+  secretKey: $$$$七牛云secretKey
+  bucket: $$$$七牛云存储空间
+  downloadUrl: $$$$七牛云访问域名，以/结尾

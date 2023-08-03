@@ -18,6 +18,8 @@ public class BaseRequestVO extends Page {
 
     private String searchKey;
 
+    private String articleSearch;
+
     // 是否推荐[0:否，1:是]
     private Boolean recommendStatus;
 

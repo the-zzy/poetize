@@ -1,5 +1,8 @@
 package com.ld.poetry.utils;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class StringUtil {
 
     public static void main(String[] args) {
@@ -18,5 +21,12 @@ public class StringUtil {
                 .replace("<img", "《img")
                 .replace("<br", "《br")
                 .replace("<input", "《input");
+    }
+
+    public static boolean matchString(String text, String searchText) {
+        Pattern pattern = Pattern.compile(Pattern.quote(searchText), Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(text);
+
+        return matcher.find();
     }
 }

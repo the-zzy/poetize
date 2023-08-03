@@ -5,13 +5,17 @@ import com.ld.poetry.dao.*;
 import com.ld.poetry.entity.*;
 import com.ld.poetry.service.UserService;
 import com.ld.poetry.vo.FamilyVO;
+import org.lionsoul.ip2region.xdb.Searcher;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.stream.Collectors;
 
 
@@ -19,6 +23,9 @@ import java.util.stream.Collectors;
 public class CommonQuery {
     @Autowired
     private CommentMapper commentMapper;
+
+    @Autowired
+    private HistoryInfoMapper historyInfoMapper;
 
     @Autowired
     private UserService userService;
@@ -34,6 +41,53 @@ public class CommonQuery {
 
     @Autowired
     private FamilyMapper familyMapper;
+
+    @Value("${ip2region.dbpath}")
+    private String dbpath;
+
+    private Searcher searcher;
+
+    @PostConstruct
+    public void init() {
+        try {
+            searcher = Searcher.newWithBuffer(Searcher.loadContentFromFile(dbpath));
+        } catch (Exception e) {
+        }
+    }
+
+    public void saveHistory(String ip) {
+        Integer userId = PoetryUtil.getUserId();
+        String ipUser = ip + (userId != null ? "_" + userId.toString() : "");
+
+        CopyOnWriteArraySet<String> ipHistory = (CopyOnWriteArraySet<String>) PoetryCache.get(CommonConst.IP_HISTORY);
+        if (!ipHistory.contains(ipUser)) {
+            synchronized (ipUser.intern()) {
+                if (!ipHistory.contains(ipUser)) {
+                    ipHistory.add(ipUser);
+                    HistoryInfo historyInfo = new HistoryInfo();
+                    historyInfo.setIp(ip);
+                    historyInfo.setUserId(userId);
+                    if (searcher != null) {
+                        try {
+                            String search = searcher.search(ip);
+                            String[] region = search.split("\\|");
+                            if (!"0".equals(region[0])) {
+                                historyInfo.setNation(region[0]);
+                            }
+                            if (!"0".equals(region[2])) {
+                                historyInfo.setProvince(region[2]);
+                            }
+                            if (!"0".equals(region[3])) {
+                                historyInfo.setCity(region[3]);
+                            }
+                        } catch (Exception e) {
+                        }
+                    }
+                    historyInfoMapper.insert(historyInfo);
+                }
+            }
+        }
+    }
 
     public User getUser(Integer userId) {
         User user = (User) PoetryCache.get(CommonConst.USER_CACHE + userId.toString());
@@ -103,6 +157,33 @@ public class CommonQuery {
         List<Integer> collect = articles.stream().map(Article::getId).collect(Collectors.toList());
         PoetryCache.put(CommonConst.USER_ARTICLE_LIST + userId.toString(), collect, CommonConst.EXPIRE);
         return collect;
+    }
+
+    public List<List<Integer>> getArticleIds(String searchText) {
+        List<Article> articles = (List<Article>) PoetryCache.get(CommonConst.ARTICLE_LIST);
+        if (articles == null) {
+            LambdaQueryChainWrapper<Article> wrapper = new LambdaQueryChainWrapper<>(articleMapper);
+            articles = wrapper.select(Article::getId, Article::getArticleTitle, Article::getArticleContent)
+                    .orderByDesc(Article::getCreateTime)
+                    .list();
+            PoetryCache.put(CommonConst.ARTICLE_LIST, articles);
+        }
+
+        List<List<Integer>> ids = new ArrayList<>();
+        List<Integer> titleIds = new ArrayList<>();
+        List<Integer> contentIds = new ArrayList<>();
+
+        for (Article article : articles) {
+            if (StringUtil.matchString(article.getArticleTitle(), searchText)) {
+                titleIds.add(article.getId());
+            } else if (StringUtil.matchString(article.getArticleContent(), searchText)) {
+                contentIds.add(article.getId());
+            }
+        }
+
+        ids.add(titleIds);
+        ids.add(contentIds);
+        return ids;
     }
 
     public List<Sort> getSortInfo() {

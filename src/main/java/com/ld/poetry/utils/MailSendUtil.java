@@ -101,7 +101,7 @@ public class MailSendUtil {
             }
         }
 
-        return String.format(MailUtil.mailText,
+        return String.format(mailUtil.getMailText(),
                 webName,
                 mailType,
                 fromName,
@@ -144,7 +144,7 @@ public class MailSendUtil {
         WebInfo webInfo = (WebInfo) PoetryCache.get(CommonConst.WEB_INFO);
         String webName = (webInfo == null ? "Poetize" : webInfo.getWebName());
 
-        return String.format(MailUtil.mailText,
+        return String.format(mailUtil.getMailText(),
                 webName,
                 String.format(MailUtil.imMail, fromName),
                 fromName,

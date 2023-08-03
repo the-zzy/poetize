@@ -182,6 +182,19 @@ CREATE TABLE `resource` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='资源信息';
 
+DROP TABLE IF EXISTS `history_info`;
+
+CREATE TABLE `history_info` (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `user_id` int DEFAULT NULL COMMENT '用户ID',
+  `ip` varchar(128) NOT NULL COMMENT 'ip',
+  `nation` varchar(64) DEFAULT NULL COMMENT '国家',
+  `province` varchar(64) DEFAULT NULL COMMENT '省份',
+  `city` varchar(64) DEFAULT NULL COMMENT '城市',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='历史信息';
+
 DROP TABLE IF EXISTS `family`;
 
 CREATE TABLE `family` (
@@ -289,7 +302,86 @@ CREATE TABLE `im_chat_user_group_message` (
 
 INSERT INTO `user` (`id`, `username`, `password`, `phone_number`, `email`, `user_status`, `gender`, `open_id`, `avatar`, `introduction`, `user_type`, `update_by`, `deleted`, `admire`) VALUES(1, 'Sara', '47bce5c74f589f4867dbd57e9ca9f808', '', '', 1, 1, '', '', '', 0, 'Sara', 0, '');
 
-INSERT INTO `web_info` (`id`, `web_name`, `web_title`, `notices`, `footer`, `background_image`, `avatar`, `random_avatar`, `random_name`, `random_cover`, `waifu_json`, `status`) VALUES(1, 'Sara', 'Poetize', '[]', '云想衣裳花想容， 春风拂槛露华浓。', '', '', '[]', '[]', '[]', '{}', 1);
+INSERT INTO `web_info` (`id`, `web_name`, `web_title`, `notices`, `footer`, `background_image`, `avatar`, `random_avatar`, `random_name`, `random_cover`, `waifu_json`, `status`) VALUES(1, 'Sara', 'Poetize', '[]', '云想衣裳花想容， 春风拂槛露华浓。', '', '', '[]', '[]', '[]', '{
+  "mouseover": [
+    {
+      "selector": "#live2d",
+      "text": [
+        "我是一个特别固执的人，我从来不会在意别人跟我说什么，让我去做，让我去怎么做，我不管。如果，你也可以像我一样，那我觉得，这件事情，太酷辣!!!"
+      ]
+    },
+    {
+      "selector": "#waifu-tool .fa-street-view",
+      "text": [
+        "喜欢换装 PLAY 吗？"
+      ]
+    },
+    {
+      "selector": "#waifu-tool .fa-times",
+      "text": [
+        "到了要说再见的时候了吗？"
+      ]
+    }
+  ],
+  "click": [
+    {
+      "selector": "#live2d",
+      "text": [
+        "你看到我的小熊了吗？"
+      ]
+    }
+  ],
+  "seasons": [
+    {
+      "date": "01/01",
+      "text": "<span>元旦</span>了呢，新的一年又开始了，今年是{year}年～"
+    },
+    {
+      "date": "02/14",
+      "text": "又是一年<span>情人节</span>，{year}年找到对象了嘛～"
+    },
+    {
+      "date": "03/08",
+      "text": "今天是<span>国际妇女节</span>！"
+    },
+    {
+      "date": "03/12",
+      "text": "今天是<span>植树节</span>，要保护环境呀！"
+    },
+    {
+      "date": "04/01",
+      "text": "悄悄告诉你一个秘密～<span>今天是愚人节，不要被骗了哦～</span>"
+    },
+    {
+      "date": "05/01",
+      "text": "今天是<span>五一劳动节</span>，计划好假期去哪里了吗～"
+    },
+    {
+      "date": "06/01",
+      "text": "<span>儿童节</span>了呢，快活的时光总是短暂，要是永远长不大该多好啊…"
+    },
+    {
+      "date": "09/03",
+      "text": "<span>中国人民抗日战争胜利纪念日</span>，铭记历史、缅怀先烈、珍爱和平、开创未来。"
+    },
+    {
+      "date": "09/10",
+      "text": "<span>教师节</span>，在学校要给老师问声好呀～"
+    },
+    {
+      "date": "10/01",
+      "text": "<span>国庆节</span>到了，为祖国母亲庆生！"
+    },
+    {
+      "date": "11/05-11/12",
+      "text": "今年的<span>双十一</span>是和谁一起过的呢～"
+    },
+    {
+      "date": "12/20-12/31",
+      "text": "这几天是<span>圣诞节</span>，主人肯定又去剁手买买买了～"
+    }
+  ]
+}', 1);
 
 INSERT INTO `im_chat_group` (`id`, `group_name`, `master_user_id`, `introduction`, `notice`, `in_type`) VALUES(-1, '公共聊天室', 1, '公共聊天室', '欢迎光临！', 0);
 
