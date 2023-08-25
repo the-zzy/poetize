@@ -54,6 +54,11 @@ public class CommonConst {
     public static final long TOKEN_EXPIRE = 864000;
 
     /**
+     * Code过期时间：1天
+     */
+    public static final long CODE_EXPIRE = 86400;
+
+    /**
      * Token重设过期时间间隔：1小时
      */
     public static final long TOKEN_INTERVAL = 3600;
@@ -79,9 +84,19 @@ public class CommonConst {
     public static final String COMMENT_IM_MAIL = "comment_im_mail_";
 
     /**
+     * 验证码邮件
+     */
+    public static final String CODE_MAIL = "code_mail_";
+
+    /**
      * 评论和IM邮件发送次数
      */
     public static final int COMMENT_IM_MAIL_COUNT = 1;
+
+    /**
+     * 验证码邮件发送次数
+     */
+    public static final int CODE_MAIL_COUNT = 3;
 
     /**
      * 验证码
@@ -198,6 +213,8 @@ public class CommonConst {
     public static final String PATH_TYPE_LOVE_MAN = "love/manCover";
 
     public static final String PATH_TYPE_LOVE_WOMAN = "love/womanCover";
+
+    public static final String PATH_TYPE_ASSETS = "assets";
 
     /**
      * 资源路径

@@ -66,7 +66,7 @@ public class MailSendUtil {
                 WebInfo webInfo = (WebInfo) PoetryCache.get(CommonConst.WEB_INFO);
                 mailUtil.sendMailMessage(mail, "您有一封来自" + (webInfo == null ? "Poetize" : webInfo.getWebName()) + "的回执！", commentMail);
                 if (count == null) {
-                    PoetryCache.put(CommonConst.COMMENT_IM_MAIL + mail.get(0), new AtomicInteger(1), CommonConst.TOKEN_EXPIRE * 4);
+                    PoetryCache.put(CommonConst.COMMENT_IM_MAIL + mail.get(0), new AtomicInteger(1), CommonConst.CODE_EXPIRE);
                 } else {
                     count.incrementAndGet();
                 }
@@ -131,7 +131,7 @@ public class MailSendUtil {
                     WebInfo webInfo = (WebInfo) PoetryCache.get(CommonConst.WEB_INFO);
                     mailUtil.sendMailMessage(mail, "您有一封来自" + (webInfo == null ? "Poetize" : webInfo.getWebName()) + "的回执！", commentMail);
                     if (count == null) {
-                        PoetryCache.put(CommonConst.COMMENT_IM_MAIL + mail.get(0), new AtomicInteger(1), CommonConst.TOKEN_EXPIRE * 4);
+                        PoetryCache.put(CommonConst.COMMENT_IM_MAIL + mail.get(0), new AtomicInteger(1), CommonConst.CODE_EXPIRE);
                     } else {
                         count.incrementAndGet();
                     }

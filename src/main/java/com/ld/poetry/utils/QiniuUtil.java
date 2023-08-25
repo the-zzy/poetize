@@ -1,19 +1,27 @@
 package com.ld.poetry.utils;
 
+import com.ld.poetry.entity.Resource;
+import com.ld.poetry.service.ResourceService;
 import com.qiniu.common.QiniuException;
 import com.qiniu.http.Response;
 import com.qiniu.storage.BucketManager;
 import com.qiniu.storage.Configuration;
 import com.qiniu.storage.Region;
 import com.qiniu.storage.model.BatchStatus;
+import com.qiniu.storage.model.FileInfo;
 import com.qiniu.util.Auth;
+import com.qiniu.util.StringMap;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -31,9 +39,20 @@ public class QiniuUtil {
     @Value("${qiniu.bucket}")
     private String bucket;
 
+    @Value("${qiniu.downloadUrl}")
+    private String downloadUrl;
+
+    private static final long EXPIRE_SECONDS = 60L;
+    private static final long F_SIZE_LIMIT = 20971520L;
+
+    @Autowired
+    private ResourceService resourceService;
+
     public String getToken(String key) {
+        StringMap putPolicy = new StringMap();
+        putPolicy.put("fsizeLimit", F_SIZE_LIMIT);
         Auth auth = Auth.create(accessKey, secretKey);
-        return auth.uploadToken(bucket, key);
+        return auth.uploadToken(bucket, key, EXPIRE_SECONDS, putPolicy);
     }
 
     public void deleteFile(List<String> files) {
@@ -94,5 +113,46 @@ public class QiniuUtil {
         }
 
         return result;
+    }
+
+    public void saveFileInfo() {
+        List<Resource> resourceList = resourceService.lambdaQuery().select(Resource::getPath).list();
+        List<String> paths = resourceList.stream().map(Resource::getPath).collect(Collectors.toList());
+
+        //构造一个带指定 Region 对象的配置类
+        Configuration cfg = new Configuration(Region.region0());
+        Auth auth = Auth.create(accessKey, secretKey);
+        BucketManager bucketManager = new BucketManager(auth, cfg);
+        //文件名前缀
+        String prefix = "";
+        //每次迭代的长度限制，最大1000，推荐值 1000
+        int limit = 1000;
+        //指定目录分隔符，列出所有公共前缀（模拟列出目录效果）。缺省值为空字符串
+        String delimiter = "";
+        //列举空间文件列表
+        BucketManager.FileListIterator fileListIterator = bucketManager.createFileListIterator(bucket, prefix, limit, delimiter);
+
+        List<Resource> resources = new ArrayList<>();
+
+        while (fileListIterator.hasNext()) {
+            FileInfo[] items = fileListIterator.next();
+            for (FileInfo item : items) {
+                if (item.fsize != 0L && !paths.contains(downloadUrl + item.key)) {
+                    Resource re = new Resource();
+                    re.setPath(downloadUrl + item.key);
+                    re.setType(CommonConst.PATH_TYPE_ASSETS);
+                    re.setSize(Integer.valueOf(Long.toString(item.fsize)));
+                    re.setMimeType(item.mimeType);
+                    re.setUserId(CommonConst.ADMIN_USER_ID);
+                    resources.add(re);
+                }
+            }
+        }
+
+        if (!CollectionUtils.isEmpty(resources)) {
+            resourceService.saveBatch(resources);
+            System.out.println("保存数量：" + resources.size());
+        }
+        System.out.println("同步完成");
     }
 }

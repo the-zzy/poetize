@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -73,11 +74,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         password = new String(SecureUtil.aes(CommonConst.CRYPOTJS_KEY.getBytes(StandardCharsets.UTF_8)).decrypt(password));
 
         User one = lambdaQuery().and(wrapper -> wrapper
-                .eq(User::getUsername, account)
-                .or()
-                .eq(User::getEmail, account)
-                .or()
-                .eq(User::getPhoneNumber, account))
+                        .eq(User::getUsername, account)
+                        .or()
+                        .eq(User::getEmail, account)
+                        .or()
+                        .eq(User::getPhoneNumber, account))
                 .eq(User::getPassword, DigestUtils.md5DigestAsHex(password.getBytes()))
                 .one();
 
@@ -301,7 +302,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             mail.add(user.getEmail());
             String text = getCodeMail(i);
             WebInfo webInfo = (WebInfo) PoetryCache.get(CommonConst.WEB_INFO);
-            mailUtil.sendMailMessage(mail, "您有一封来自" + (webInfo == null ? "Poetize" : webInfo.getWebName()) + "的回执！", text);
+
+            AtomicInteger count = (AtomicInteger) PoetryCache.get(CommonConst.CODE_MAIL + mail.get(0));
+            if (count == null || count.get() < CommonConst.CODE_MAIL_COUNT) {
+                mailUtil.sendMailMessage(mail, "您有一封来自" + (webInfo == null ? "Poetize" : webInfo.getWebName()) + "的回执！", text);
+                if (count == null) {
+                    PoetryCache.put(CommonConst.CODE_MAIL + mail.get(0), new AtomicInteger(1), CommonConst.CODE_EXPIRE);
+                } else {
+                    count.incrementAndGet();
+                }
+            } else {
+                return PoetryResult.fail("验证码发送次数过多，请明天再试！");
+            }
         }
         PoetryCache.put(CommonConst.USER_CODE + PoetryUtil.getUserId() + "_" + flag, Integer.valueOf(i), 300);
         return PoetryResult.success();
@@ -318,7 +330,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             mail.add(place);
             String text = getCodeMail(i);
             WebInfo webInfo = (WebInfo) PoetryCache.get(CommonConst.WEB_INFO);
-            mailUtil.sendMailMessage(mail, "您有一封来自" + (webInfo == null ? "Poetize" : webInfo.getWebName()) + "的回执！", text);
+
+            AtomicInteger count = (AtomicInteger) PoetryCache.get(CommonConst.CODE_MAIL + mail.get(0));
+            if (count == null || count.get() < CommonConst.CODE_MAIL_COUNT) {
+                mailUtil.sendMailMessage(mail, "您有一封来自" + (webInfo == null ? "Poetize" : webInfo.getWebName()) + "的回执！", text);
+                if (count == null) {
+                    PoetryCache.put(CommonConst.CODE_MAIL + mail.get(0), new AtomicInteger(1), CommonConst.CODE_EXPIRE);
+                } else {
+                    count.incrementAndGet();
+                }
+            } else {
+                return PoetryResult.fail("验证码发送次数过多，请明天再试！");
+            }
         }
         PoetryCache.put(CommonConst.USER_CODE + PoetryUtil.getUserId() + "_" + place + "_" + flag, Integer.valueOf(i), 300);
         return PoetryResult.success();
@@ -397,7 +420,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             mail.add(place);
             String text = getCodeMail(i);
             WebInfo webInfo = (WebInfo) PoetryCache.get(CommonConst.WEB_INFO);
-            mailUtil.sendMailMessage(mail, "您有一封来自" + (webInfo == null ? "Poetize" : webInfo.getWebName()) + "的回执！", text);
+
+            AtomicInteger count = (AtomicInteger) PoetryCache.get(CommonConst.CODE_MAIL + mail.get(0));
+            if (count == null || count.get() < CommonConst.CODE_MAIL_COUNT) {
+                mailUtil.sendMailMessage(mail, "您有一封来自" + (webInfo == null ? "Poetize" : webInfo.getWebName()) + "的回执！", text);
+                if (count == null) {
+                    PoetryCache.put(CommonConst.CODE_MAIL + mail.get(0), new AtomicInteger(1), CommonConst.CODE_EXPIRE);
+                } else {
+                    count.incrementAndGet();
+                }
+            } else {
+                return PoetryResult.fail("验证码发送次数过多，请明天再试！");
+            }
         }
         PoetryCache.put(CommonConst.FORGET_PASSWORD + place + "_" + flag, Integer.valueOf(i), 300);
         return PoetryResult.success();

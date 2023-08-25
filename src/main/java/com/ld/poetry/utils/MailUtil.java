@@ -93,7 +93,7 @@ public class MailUtil {
                 "            </a>\n" +
                 "        </div>\n" +
                 "        <div style=\"margin-top: 20px;font-size: 12px;color: #00000045\">\n" +
-                "            此邮件由 %s 自动发出，直接回复无效（一天最多发送 " + CommonConst.COMMENT_IM_MAIL_COUNT + " 条通知邮件），退订请联系站长。\n" +
+                "            此邮件由 %s 自动发出，直接回复无效（一天最多发送 " + CommonConst.COMMENT_IM_MAIL_COUNT + " 条通知邮件和 " + CommonConst.CODE_MAIL_COUNT + " 条验证码邮件），退订请联系站长。\n" +
                 "        </div>\n" +
                 "    </div>\n" +
                 "</div>";

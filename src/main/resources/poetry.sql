@@ -179,7 +179,8 @@ CREATE TABLE `resource` (
   `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT '是否启用[0:否，1:是]',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
 
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_path` (`path`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='资源信息';
 
 DROP TABLE IF EXISTS `history_info`;

@@ -30,6 +30,10 @@ public class SaveCheckAspect {
         if (StringUtils.hasText(token)) {
             User user = (User) PoetryCache.get(token);
             if (user != null) {
+                if (user.getId().intValue() == PoetryUtil.getAdminUser().getId().intValue()) {
+                    return joinPoint.proceed();
+                }
+
                 AtomicInteger atomicInteger = (AtomicInteger) PoetryCache.get(CommonConst.SAVE_COUNT_USER_ID + user.getId().toString());
                 if (atomicInteger == null) {
                     atomicInteger = new AtomicInteger();

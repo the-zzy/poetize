@@ -14,7 +14,7 @@ spring:
   mail:
     host: smtp.qq.com
     username: $$$$邮箱地址
-    password: $$$$邮箱密码
+    password: $$$$邮箱授权码
     default-encoding: utf-8
     protocol: smtp
     port: 465
@@ -42,4 +42,4 @@ qiniu:
   accessKey: $$$$七牛云accessKey
   secretKey: $$$$七牛云secretKey
   bucket: $$$$七牛云存储空间
-  downloadUrl: $$$$七牛云访问域名，以/结尾
+  downloadUrl: $$$$七牛云访问域名，以/结尾，仿照【https://file.poetize.cn/】
